@@ -1,3 +1,4 @@
+#![cfg_attr(feature = "reverse_bits", feature(reverse_bits))]
 // Copyright (c) 2018 King's College London created by the Software Development Team
 // <http://soft-dev.org/>
 //
@@ -162,6 +163,9 @@ impl Vob<usize> {
     /// Create a Vob from a `u8` slice. The most significant bit of each byte comes first in the
     /// resulting Vob.
     ///
+    /// If the optional feature `reverse_bits` is enabled (and you're running nightly)
+    /// it will use the new `reverse_bits` method.
+    ///
     /// # Examples
     ///
     /// ```
@@ -187,12 +191,21 @@ impl Vob<usize> {
                     continue;
                 }
                 let b = slice[off];
-                if b != 0 {
-                    let mut rb: u8 = 0; // the byte b with its bits in reverse order
-                    for k in 0..8 {
-                        rb |= ((b >> k) & 1) << (8 - k - 1);
+                #[cfg(not(feature = "reverse_bits"))]
+                {
+                    if b != 0 {
+                        {
+                            let mut rb: u8 = 0; // the byte b with its bits in reverse order
+                            for k in 0..8 {
+                                rb |= ((b >> k) & 1) << (8 - k - 1);
+                            }
+                            w |= (rb as usize) << (j * 8);
+                        }
                     }
-                    w |= (rb as usize) << (j * 8);
+                }
+                #[cfg(feature = "reverse_bits")]
+                {
+                    w |= (b.reverse_bits() as usize) << (j * 8);
                 }
             }
             v.vec.push(w);

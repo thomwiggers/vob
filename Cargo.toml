@@ -19,3 +19,4 @@ rand = "0.5"
 
 [features]
 unsafe_internals = []
+reverse_bits = []

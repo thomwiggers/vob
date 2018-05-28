@@ -1,13 +1,26 @@
 language: rust
 
+rust:
+  - stable
+  - beta
+  - nightly
+env:
+  - FEATURES=unsafe_internals
+  - FEATURES=reverse_bits
+  - FEATURES=reverse_bits unsafe_internals
+
 matrix:
+  # Exclude combinations with unstable features for stable and beta
+  exclude:
+    - rust: stable
+    - rust: beta
   include:
-    - rust: nightly
-      env: FEATURES=unsafe_internals
     - rust: nightly
       env: FEATURES=''
     - rust: stable
+      env: FEATURES=''
     - rust: beta
+      env: FEATURES=''
 
 before_script:
   - rustup component add rustfmt-preview
